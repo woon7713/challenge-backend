@@ -6,6 +6,8 @@ import com.example.challenge.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import io.swagger.v3.oas.annotations.Operation;
+
 @RestController
 @RequestMapping("/api/members")
 @RequiredArgsConstructor
