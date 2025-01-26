@@ -1,7 +1,9 @@
 package com.example.challenge.controller;
 
-import com.example.challenge.entity.Comment;
+import com.example.challenge.dto.CommentRequestDto;
+import com.example.challenge.dto.CommentResponseDto;
 import com.example.challenge.service.CommentService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +21,12 @@ public class CommentController {
 
     // 1) 댓글 생성
     @PostMapping
-    public ResponseEntity<Comment> createComment(
+    public ResponseEntity<CommentResponseDto> createComment(
             @RequestParam Long postId,
             @RequestParam Long memberId,
-            @RequestBody String content
+            @RequestBody CommentRequestDto requestDto
     ) {
-        Comment createdComment = commentService.createComment(postId, memberId, content);
+        CommentResponseDto createdComment = commentService.createComment(postId, memberId, requestDto);
         if (createdComment == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -33,18 +35,18 @@ public class CommentController {
 
     // 2) 특정 게시글의 모든 댓글 조회
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<Comment>> getCommentsByPostId(@PathVariable Long postId) {
-        List<Comment> comments = commentService.getCommentsByPostId(postId);
+    public ResponseEntity<List<CommentResponseDto>> getCommentsByPostId(@PathVariable Long postId) {
+        List<CommentResponseDto> comments = commentService.getCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 
     // 3) 댓글 수정
     @PutMapping("/{commentId}")
-    public ResponseEntity<Comment> updateComment(
+    public ResponseEntity<CommentResponseDto> updateComment(
             @PathVariable Long commentId,
             @RequestBody String newContent
     ) {
-        Comment updatedComment = commentService.updateComment(commentId, newContent);
+        CommentResponseDto updatedComment = commentService.updateComment(commentId, newContent);
         if (updatedComment == null) {
             return ResponseEntity.notFound().build();
         }
@@ -56,5 +58,16 @@ public class CommentController {
     public ResponseEntity<Void> deleteComment(@PathVariable Long commentId) {
         commentService.deleteComment(commentId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 5) 특정 게시글의 댓글 페이징
+    @GetMapping("/post/{postId}/page")
+    public ResponseEntity<Page<CommentResponseDto>> getPagedComments(
+            @PathVariable Long postId,
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        Page<CommentResponseDto> comments = commentService.getPagedComments(postId, page, size);
+        return ResponseEntity.ok(comments);
     }
 }
