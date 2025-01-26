@@ -4,6 +4,7 @@ import com.example.challenge.dto.PostRequestDto;
 import com.example.challenge.dto.PostResponseDto;
 import com.example.challenge.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,5 +49,14 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public void deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
+    }
+
+    //게시글 페이징
+    @GetMapping("/page")
+    public Page<PostResponseDto> getPagePosts(
+            @RequestParam int page,
+            @RequestParam int size)
+    {
+        return postService.getPagePosts(page, size);
     }
 }

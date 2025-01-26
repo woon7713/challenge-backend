@@ -7,6 +7,9 @@ import com.example.challenge.entity.Post;
 import com.example.challenge.repository.MemberRepository;
 import com.example.challenge.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -95,4 +98,21 @@ public class PostService {
         // (작성자 본인이 맞는지 검증 추가 필요)
         postRepository.deleteById(postId);
     }
+
+    // (6) 게시글 페이지
+    public Page<PostResponseDto> getPagePosts(int page, int size){
+        Pageable pageable = PageRequest.of(page, size); // 페이지, 크기 설정
+        Page<Post> postPage = postRepository.findAll(pageable);
+
+        // Page<Post> -> Page<PostResponseDto> 변환
+        return postPage.map(post -> new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getMember().getUsername()
+        ));
+
+    }
+
+
 }
