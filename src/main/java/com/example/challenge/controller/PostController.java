@@ -59,4 +59,17 @@ public class PostController {
     {
         return postService.getPagePosts(page, size);
     }
+
+    //게시물 검색
+    @GetMapping("/search")
+    public Page<PostResponseDto> searchPosts(
+            @RequestParam String keyword,
+            @RequestParam int page,
+            @RequestParam int size
+    ){
+        return postService.searchPosts(keyword, page, size);
+
+    }
+
+
 }

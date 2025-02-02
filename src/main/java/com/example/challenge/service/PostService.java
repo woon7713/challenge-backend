@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -114,5 +115,18 @@ public class PostService {
 
     }
 
+    // (7) 게시글 검색 기능
+    public Page<PostResponseDto> searchPosts(String keyword, int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> postPage = postRepository.findByTitleContainingOrContentContaining(keyword, keyword, pageable);
+
+        return postPage.map(post -> new PostResponseDto(
+                post.getId(),
+                post.getTitle(),
+                post.getContent(),
+                post.getMember().getUsername()
+        ));
+
+    }
 
 }

@@ -7,5 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAll(Pageable pageable); // Pageable 타입을 사용한 메서드
+    Page<Post> findByTitleContainingOrContentContaining(String titleKeyword, String contentKeyword, Pageable pageable);
+
 
 }
