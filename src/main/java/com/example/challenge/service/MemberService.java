@@ -31,7 +31,7 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
 
         // 4) 응답 DTO 변환
-        return new MemberResponseDto(savedMember.getId(), savedMember.getUsername(), savedMember.getEmail());
+        return new MemberResponseDto(savedMember.getId(), savedMember.getUsername(), savedMember.getEmail(), savedMember.getCreatedAt(), savedMember.getUpdatedAt());
     }
 
     // 로그인 (간단 버전, JWT 적용 전)
@@ -45,6 +45,6 @@ public class MemberService {
         }
 
         // 로그인 성공 → MemberResponseDto 반환
-        return new MemberResponseDto(member.getId(), member.getUsername(), member.getEmail());
+        return new MemberResponseDto(member.getId(), member.getUsername(), member.getEmail(), member.getCreatedAt(), member.getUpdatedAt());
     }
 }

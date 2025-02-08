@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -12,5 +14,10 @@ public class PostResponseDto {
     private String title;
     private String content;
     private String username;
+    private int viewCount;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+
 
 }

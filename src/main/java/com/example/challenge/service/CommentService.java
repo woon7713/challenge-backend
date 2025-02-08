@@ -51,7 +51,9 @@ public class CommentService {
                 savedComment.getId(),
                 savedComment.getContent(),
                 savedComment.getMember().getUsername(), // 작성자 아이디
-                savedComment.getPost().getId()
+                savedComment.getPost().getId(),
+                savedComment.getCreatedAt(),
+                savedComment.getUpdatedAt()
         );
     }
 
@@ -64,7 +66,9 @@ public class CommentService {
                         comment.getId(),
                         comment.getContent(),
                         comment.getMember().getUsername(),
-                        comment.getPost().getId()
+                        comment.getPost().getId(),
+                        comment.getCreatedAt(),
+                        comment.getUpdatedAt()
                 ))
                 .collect(Collectors.toList());
     }
@@ -82,7 +86,9 @@ public class CommentService {
                 updatedComment.getId(),
                 updatedComment.getContent(),
                 updatedComment.getMember().getUsername(),
-                updatedComment.getPost().getId()
+                updatedComment.getPost().getId(),
+                updatedComment.getCreatedAt(),
+                updatedComment.getUpdatedAt()
         );
     }
 
@@ -99,7 +105,9 @@ public class CommentService {
                         comment.getId(),
                         comment.getContent(),
                         comment.getMember().getUsername(),
-                        comment.getPost().getId()
+                        comment.getPost().getId(),
+                        comment.getCreatedAt(),
+                        comment.getUpdatedAt()
                 ));
     }
 }

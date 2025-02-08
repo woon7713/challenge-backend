@@ -43,7 +43,10 @@ public class PostService {
                 savedPost.getId(),
                 savedPost.getTitle(),
                 savedPost.getContent(),
-                savedPost.getMember().getUsername()  // 작성자 username
+                savedPost.getMember().getUsername(),  // 작성자 username
+                savedPost.getViewCount(),
+                savedPost.getCreatedAt(),
+                savedPost.getUpdatedAt()
         );
     }
 
@@ -57,7 +60,12 @@ public class PostService {
                         post.getId(),
                         post.getTitle(),
                         post.getContent(),
-                        post.getMember().getUsername()
+                        post.getMember().getUsername(),
+                        post.getViewCount(),
+                        post.getCreatedAt(),
+                        post.getUpdatedAt()
+
+
                 ))
                 .collect(Collectors.toList());
     }
@@ -71,7 +79,10 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getMember().getUsername()
+                post.getMember().getUsername(),
+                post.getViewCount(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
         );
     }
 
@@ -90,7 +101,10 @@ public class PostService {
                 updatedPost.getId(),
                 updatedPost.getTitle(),
                 updatedPost.getContent(),
-                updatedPost.getMember().getUsername()
+                updatedPost.getMember().getUsername(),
+                updatedPost.getViewCount(),
+                updatedPost.getCreatedAt(),
+                updatedPost.getUpdatedAt()
         );
     }
 
@@ -110,7 +124,10 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getMember().getUsername()
+                post.getMember().getUsername(),
+                post.getViewCount(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
         ));
 
     }
@@ -124,7 +141,10 @@ public class PostService {
                 post.getId(),
                 post.getTitle(),
                 post.getContent(),
-                post.getMember().getUsername()
+                post.getMember().getUsername(),
+                post.getViewCount(),
+                post.getCreatedAt(),
+                post.getUpdatedAt()
         ));
 
     }
