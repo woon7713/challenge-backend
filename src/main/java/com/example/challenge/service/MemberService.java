@@ -5,6 +5,7 @@ import com.example.challenge.dto.MemberResponseDto;
 import com.example.challenge.entity.Member;
 import com.example.challenge.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder; // BCryptPasswordEncoder 주입
 
     // 회원 가입
     public MemberResponseDto register(MemberRequestDto requestDto) {
@@ -20,10 +22,13 @@ public class MemberService {
             throw new IllegalArgumentException("이미 존재하는 username 입니다.");
         }
 
+        // 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+
         // 2) 엔티티 생성
         Member member = Member.builder()
                 .username(requestDto.getUsername())
-                .password(requestDto.getPassword()) // 비밀번호 암호화 필요
+                .password(encodedPassword) // 암호화 비밀번호 저장
                 .email(requestDto.getEmail())
                 .build();
 
@@ -39,8 +44,8 @@ public class MemberService {
         Member member = memberRepository.findByUsername(requestDto.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 username 입니다."));
 
-        // (비밀번호 확인 로직)
-        if (!member.getPassword().equals(requestDto.getPassword())) {
+        // (비밀번호 확인 로직 - BCrypt 사용)
+        if (!passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
