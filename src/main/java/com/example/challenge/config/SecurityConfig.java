@@ -1,9 +1,8 @@
 package com.example.challenge.config;
 
-import com.example.challenge.entity.Member;
 import com.example.challenge.repository.MemberRepository;
 import com.example.challenge.security.JwtAuthenticationFilter;
-import com.example.challenge.security.JwtUtil;
+import com.example.challenge.security.JwtProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,11 +18,11 @@ import org.springframework.web.filter.CorsFilter;
 @Configuration
 public class SecurityConfig {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-    public SecurityConfig(JwtUtil jwtUtil, MemberRepository memberRepository) {
-        this.jwtUtil = jwtUtil;
+    public SecurityConfig(JwtProvider jwtProvider, MemberRepository memberRepository) {
+        this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
     }
 
@@ -38,7 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/members/login", "/api/members/register").permitAll()
                         .anyRequest().authenticated()  // 모든 요청 허용
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, memberRepository),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository),
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -10,7 +10,7 @@ import java.security.Key;
 import java.util.Date;
 
 @Component
-public class JwtUtil {
+public class JwtProvider {
     // HS512 알고리즘에 적합한 강력한 키 생성 (512비트 이상)
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512); // 비밀키는 실제 서비스에서는 환경변수나 별도 설정 파일로 안전하게 관리 필요
     private final long EXPIRATION_TIME = 24 * 60 * 60 * 1000; // 토큰 만료 시간(밀리초 단위)

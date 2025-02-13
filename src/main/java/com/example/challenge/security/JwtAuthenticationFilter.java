@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,11 +16,11 @@ import java.util.Collections;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-    public JwtAuthenticationFilter(JwtUtil jwtutil, MemberRepository memberRepository) {
-        this.jwtUtil = jwtutil;
+    public JwtAuthenticationFilter(JwtProvider jwtProvider, MemberRepository memberRepository) {
+        this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
     }
 
@@ -31,8 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
 
-        if(StringUtils.hasText(token) && jwtUtil.validateToken(token)){
-            String username = jwtUtil.extractUsername(token);
+        if(StringUtils.hasText(token) && jwtProvider.validateToken(token)){
+            String username = jwtProvider.extractUsername(token);
             Member member = memberRepository.findByUsername(username).orElse(null);
             if(member!=null){
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

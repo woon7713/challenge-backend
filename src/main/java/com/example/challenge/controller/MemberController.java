@@ -2,13 +2,11 @@ package com.example.challenge.controller;
 
 import com.example.challenge.dto.MemberRequestDto;
 import com.example.challenge.dto.MemberResponseDto;
-import com.example.challenge.security.JwtUtil;
+import com.example.challenge.security.JwtProvider;
 import com.example.challenge.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import io.swagger.v3.oas.annotations.Operation;
 
 import java.util.Map;
 
@@ -18,7 +16,7 @@ import java.util.Map;
 public class MemberController {
 
     private final MemberService memberService;
-    private final JwtUtil jwtUtil;
+    private final JwtProvider jwtProvider;
 
     // 회원 가입
     @PostMapping("/register")
@@ -30,7 +28,7 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody MemberRequestDto requestDto) {
         MemberResponseDto memberResponseDto = memberService.login(requestDto);
-        String token = jwtUtil.generateToken(memberResponseDto.getUsername());
+        String token = jwtProvider.generateToken(memberResponseDto.getUsername());
         return ResponseEntity.ok(Map.of("token", token, "member", memberResponseDto));
     }
 }
