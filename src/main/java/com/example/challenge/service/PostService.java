@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -91,7 +93,16 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
 
+        // 현재 인증된 사용자 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member currentMember = (Member) authentication.getPrincipal();
 
+        // 게시글 작성자와 현재 인증 사용자가 일치하는지 확인
+        if (!post.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException("작성자만 수정할 수 있습니다.");
+        }
+
+        //수정 진행
         post.setTitle(requestDto.getTitle());
         post.setContent(requestDto.getContent());
 
@@ -110,7 +121,19 @@ public class PostService {
 
     // (5) 게시글 삭제
     public void deletePost(Long postId) {
-        // (작성자 본인이 맞는지 검증 추가 필요)
+        // 삭제할 게시글 가져오기
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member currentMember = (Member) authentication.getPrincipal();
+
+        // 게시글 작성자와 현재 인증 사용자가 일치하는지 확인
+        if (!post.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+        }
+
+        // 삭제 진행
         postRepository.deleteById(postId);
     }
 
