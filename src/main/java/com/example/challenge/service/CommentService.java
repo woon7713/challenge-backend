@@ -11,6 +11,8 @@ import com.example.challenge.repository.PostRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -75,13 +77,23 @@ public class CommentService {
 
     // 3) 댓글 수정
     public CommentResponseDto updateComment(Long commentId, String newContent) {
-        Optional<Comment> commentOpt = commentRepository.findById(commentId);
-        if (commentOpt.isEmpty()) {
-            return null;
+        // 댓글 조회 및 존재 확인
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+
+        // 현재 인증된 사용자 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member currentMember = (Member) authentication.getPrincipal();
+
+        // 작성자 검증
+        if (!comment.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException("작성자만 댓글을 수정할 수 있습니다.");
         }
-        Comment existingComment = commentOpt.get();
-        existingComment.setContent(newContent);
-        Comment updatedComment = commentRepository.save(existingComment);
+
+        // 수정 진행
+        comment.setContent(newContent);
+        Comment updatedComment = commentRepository.save(comment);
+
         return new CommentResponseDto(
                 updatedComment.getId(),
                 updatedComment.getContent(),
@@ -94,7 +106,21 @@ public class CommentService {
 
     // 4) 댓글 삭제
     public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+        // 삭제할 댓글 가져오기
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다."));
+
+        // 현재 인증된 사용자 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Member currentMember = (Member) authentication.getPrincipal();
+
+        // 댓글 작성자와 현재 인증 사용자가 일치하는지 확인
+        if (!comment.getMember().getId().equals(currentMember.getId())) {
+            throw new IllegalArgumentException("작성자만 삭제할 수 있습니다.");
+        }
+
+        // 삭제 진행
+        commentRepository.delete(comment);
     }
 
     // 5) 댓글 페이징
