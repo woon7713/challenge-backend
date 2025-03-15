@@ -12,8 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+
+import java.util.Arrays;
 
 @Configuration
 public class SecurityConfig {
@@ -26,32 +28,44 @@ public class SecurityConfig {
         this.memberRepository = memberRepository;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화
-                .cors(cors -> cors.disable()) // CORS 비활성화
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/members/login", "/api/members/register").permitAll()
-                        .anyRequest().authenticated()  // 모든 요청 허용
-                )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository),
-                        UsernamePasswordAuthenticationFilter.class);
+        // CSRF 비활성화
+        http.csrf(csrf -> csrf.disable());
+
+        // CORS 설정 활성화 (아래 corsConfigurationSource 빈 사용)
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+        // 세션 관리: Stateless 설정
+        http.sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+
+        // URL 접근 권한 설정
+        http.authorizeHttpRequests(auth ->
+                auth.requestMatchers("/api/members/login", "/api/members/register").permitAll()
+                        .anyRequest().authenticated()
+        );
+
+        // JWT 인증 필터 추가
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository),
+                UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
+    // CORS 설정을 위한 CorsConfigurationSource 빈 등록
     @Bean
-    public CorsFilter corsFilter() {
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));  // 프론트엔드 URL 허용
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));  // 모든 HTTP 메서드 허용
+        configuration.setAllowedHeaders(Arrays.asList("*"));  // 모든 요청 헤더 허용
+        configuration.setAllowCredentials(true);  // 인증 정보 허용
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");  // 프론트엔드 URL 허용
-        config.addAllowedMethod("*");  // 모든 HTTP 메서드 허용
-        config.addAllowedHeader("*");  // 모든 요청 헤더 허용
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     // BCryptPasswordEncoder Bean 추가
