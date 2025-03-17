@@ -39,7 +39,7 @@ public class MemberService {
         return new MemberResponseDto(savedMember.getId(), savedMember.getUsername(), savedMember.getEmail(), savedMember.getCreatedAt(), savedMember.getUpdatedAt());
     }
 
-    // 로그인 (간단 버전, JWT 적용 전)
+    // 로그인
     public MemberResponseDto login(MemberRequestDto requestDto) {
         Member member = memberRepository.findByUsername(requestDto.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 username 입니다."));
