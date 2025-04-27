@@ -14,6 +14,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.Arrays;
 
@@ -39,17 +40,28 @@ public class SecurityConfig {
         // 세션 관리: Stateless 설정
         http.sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
+        )
+        //URL 권한 설정
+          .authorizeHttpRequests(auth -> auth
+                // 로그인·회원가입은 인증 없이 허용
+                .requestMatchers("/api/members/login", "/api/members/register").permitAll()
 
-        // URL 접근 권한 설정
-        http.authorizeHttpRequests(auth ->
-                auth.requestMatchers("/api/members/login", "/api/members/register").permitAll()
-                        .anyRequest().authenticated()
-        );
+                // 게시글·댓글 조회(GET)은 비회원도 접근 허용
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/posts/**",
+                        "/api/comments/**"
+                ).permitAll()
 
-        // JWT 인증 필터 추가
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtProvider, memberRepository),
-                UsernamePasswordAuthenticationFilter.class);
+                // 그 외 모든 요청은 인증 필요
+                .anyRequest().authenticated()
+        )
+
+                // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 삽입
+                .addFilterBefore(
+                        new JwtAuthenticationFilter(jwtProvider, memberRepository),
+                        UsernamePasswordAuthenticationFilter.class
+                );
 
         return http.build();
     }
